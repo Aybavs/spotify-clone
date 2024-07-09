@@ -166,6 +166,49 @@ app.post(
   }
 );
 
+app.get("/search", (req, res) => {
+  const { query } = req.query;
+  const searchQuery = `%${query}%`;
+  const searchSongsQuery = "SELECT * FROM songs WHERE title LIKE ?";
+  const searchArtistsQuery = "SELECT * FROM artists WHERE name LIKE ?";
+
+  db.query(searchSongsQuery, [searchQuery], (err, songsResult) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Bir hata oluştu" });
+      return;
+    }
+
+    db.query(searchArtistsQuery, [searchQuery], (err, artistsResult) => {
+      if (err) {
+        console.error(err);
+        res.status(500).json({ message: "Bir hata oluştu" });
+        return;
+      }
+
+      const searchResult = {
+        songs: songsResult,
+        artists: artistsResult,
+      };
+
+      res.status(200).json(searchResult);
+    });
+  });
+});
+
+app.get("/user/playlists", (req, res) => {
+  const userId = req.query.userId;
+  const query = "SELECT * FROM playlists WHERE user_id = ?";
+  db.query(query, [userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "Bir hata oluştu" });
+      return;
+    }
+    res.status(200).json(result);
+  });
+});
+
 const server = http.createServer(app);
 server.listen(port, () => {
   console.log(`API çalışıyor: http://localhost:${port}`);
