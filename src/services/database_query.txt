@@ -1,0 +1,60 @@
+Table Users {
+    user_id INT [pk, increment]
+    username VARCHAR(50) [not null, unique]
+    email VARCHAR(100) [not null, unique]
+    password_hash VARCHAR(255) [not null]
+    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
+}
+
+Table Artists {
+    artist_id INT [pk, increment]
+    name VARCHAR(100) [not null]
+    bio TEXT
+    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
+}
+
+Table Albums {
+    album_id INT [pk, increment]
+    title VARCHAR(100) [not null]
+    artist_id INT [ref: > Artists.artist_id]
+    release_date DATE
+    cover_image_url VARCHAR(255)
+    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
+}
+
+Table Songs {
+    song_id INT [pk, increment]
+    title VARCHAR(100) [not null]
+    album_id INT [ref: > Albums.album_id]
+    artist_id INT [ref: > Artists.artist_id]
+    duration INT [not null] // şarkı süresi saniye cinsinden
+    audio_file_url VARCHAR(255) [not null]
+    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
+    image VARCHAR(255)
+}
+
+Table Playlists {
+    playlist_id INT [pk, increment]
+    name VARCHAR(100) [not null]
+    user_id INT [ref: > Users.user_id]
+    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
+    bgcolor VARCHAR(45)
+}
+
+Table Playlist_Songs {
+    playlist_id INT [ref: > Playlists.playlist_id]
+    song_id INT [ref: > Songs.song_id]
+    added_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
+    indexes {
+        (playlist_id, song_id) [pk]
+    }
+}
+
+Table Follows {
+    user_id INT [ref: > Users.user_id]
+    artist_id INT [ref: > Artists.artist_id]
+    followed_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
+    indexes {
+        (user_id, artist_id) [pk]
+    }
+}
