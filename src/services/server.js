@@ -1,8 +1,12 @@
-const express = require("express");
-const mysql = require("mysql");
-const bcrypt = require("bcryptjs");
-const http = require("http");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import mysql from "mysql";
+import bcrypt from "bcrypt";
+import http from "http";
+import fs from "fs";
+import path from "path";
+import multer from "multer";
+const upload = multer({ dest: 'uploads/' });
 
 const port = 3000;
 
@@ -95,71 +99,71 @@ app.get("/playlist/:id/songs", (req, res) => {
 });
 
 app.post(
-    "/addSong",
-    upload.fields([
-        { name: "image", maxCount: 1 },
-        { name: "song", maxCount: 1 },
-    ]),
-    (req, res) => {
-        const { title, artist_id, album_id } = req.body;
+  "/addSong",
+  upload.fields([
+      { name: "image", maxCount: 1 },
+      { name: "song", maxCount: 1 },
+  ]),
+  (req, res) => {
+      const { title, artist_id, album_id } = req.body;
 
-        // First, add the song to the database
-        const query =
-            "INSERT INTO songs (title, artist_id, album_id) VALUES (?, ?, ?)";
-        const values = [title, artist_id, album_id];
+      // Önce şarkıyı veritabanına ekleyin
+      const query =
+          "INSERT INTO songs (title, artist_id, album_id) VALUES (?, ?, ?)";
+      const values = [title, artist_id, album_id];
 
-        db.query(query, values, (err, result) => {
-            if (err) {
-                console.error("An error occurred while adding the song:", err);
-                return res.status(500).send("An error occurred while adding the song.");
-            }
+      db.query(query, values, (err, result) => {
+          if (err) {
+              console.error("Şarkı eklenirken bir hata oluştu:", err);
+              return res.status(500).send("Şarkı eklenirken bir hata oluştu.");
+          }
 
-            const songId = result.insertId; // The inserted song's ID
+          const songId = result.insertId; // Eklenen şarkının ID'si
 
-            // Generate file names with the song ID
-            const imageFileName = `image_${songId}.jpg`;
-            const songFileName = `song_${songId}.mp3`;
+          // Şarkı ID'si ile dosya adları oluşturun
+          const imageFileName = `image_${songId}.jpg`;
+          const songFileName = `song_${songId}.mp3`;
 
-            // Rename and save the files to the correct locations
-            const oldImagePath = req.files.image[0].path;
-            const oldSongPath = req.files.song[0].path;
+          // Dosyaları doğru konumlara yeniden adlandırarak kaydedin
+          const oldImagePath = req.files.image[0].path;
+          const oldSongPath = req.files.song[0].path;
 
-            const newImagePath = path.join(__dirname, "images", imageFileName);
-            const newSongPath = path.join(__dirname, "songs", songFileName);
+          const newImagePath = path.join(__dirname, "src", "components", imageFileName);
+          const newSongPath = path.join(__dirname, "src", "components", songFileName);
 
-            fs.rename(oldImagePath, newImagePath, (err) => {
-                if (err) {
-                    console.error("An error occurred while renaming the image file:", err);
-                    return res.status(500).send("An error occurred while renaming the image file.");
-                }
+          fs.rename(oldImagePath, newImagePath, (err) => {
+              if (err) {
+                  console.error("Görsel dosyası yeniden adlandırılırken bir hata oluştu:", err);
+                  return res.status(500).send("Görsel dosyası yeniden adlandırılırken bir hata oluştu.");
+              }
 
-                fs.rename(oldSongPath, newSongPath, (err) => {
-                    if (err) {
-                        console.error("An error occurred while renaming the song file:", err);
-                        return res.status(500).send("An error occurred while renaming the song file.");
-                    }
+              fs.rename(oldSongPath, newSongPath, (err) => {
+                  if (err) {
+                      console.error("Şarkı dosyası yeniden adlandırılırken bir hata oluştu:", err);
+                      return res.status(500).send("Şarkı dosyası yeniden adlandırılırken bir hata oluştu.");
+                  }
 
-                    // Determine the relative file paths
-                    const relativeImagePath = path.join("../assets", imageFileName);
-                    const relativeSongPath = path.join("../assets", songFileName);
+                  // Göreli dosya yollarını belirleyin
+                  const relativeImagePath = path.join("src", "components", imageFileName);
+                  const relativeSongPath = path.join("src", "components", songFileName);
 
-                    // Update the file names in the database
-                    const updateQuery =
-                        "UPDATE songs SET image = ?, audio_file_url = ? WHERE id = ?";
-                    const updateValues = [relativeImagePath, relativeSongPath, songId];
+                  // Dosya adlarını veritabanında güncelleyin
+                  const updateQuery =
+                      "UPDATE songs SET image = ?, audio_file_url = ? WHERE song_id = ?";
+                  const updateValues = [relativeImagePath, relativeSongPath, songId];
 
-                    db.query(updateQuery, updateValues, (err) => {
-                        if (err) {
-                            console.error("An error occurred while updating the file names:", err);
-                            return res.status(500).send("An error occurred while updating the file names.");
-                        }
+                  db.query(updateQuery, updateValues, (err) => {
+                      if (err) {
+                          console.error("Dosya adları güncellenirken bir hata oluştu:", err);
+                          return res.status(500).send("Dosya adları güncellenirken bir hata oluştu.");
+                      }
 
-                        res.status(201).send("Song and details added successfully.");
-                    });
-                });
-            });
-        });
-    }
+                      res.status(201).send("Şarkı ve detaylar başarıyla eklendi.");
+                  });
+              });
+          });
+      });
+  }
 );
 
 const server = http.createServer(app);
