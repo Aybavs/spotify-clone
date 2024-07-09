@@ -1,60 +1,72 @@
-Table Users {
-    user_id INT [pk, increment]
-    username VARCHAR(50) [not null, unique]
-    email VARCHAR(100) [not null, unique]
-    password_hash VARCHAR(255) [not null]
-    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
-}
+-- Users tablosu
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-Table Artists {
-    artist_id INT [pk, increment]
-    name VARCHAR(100) [not null]
-    bio TEXT
-    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
-}
+-- Artists tablosu
+CREATE TABLE Artists (
+    artist_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    bio TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-Table Albums {
-    album_id INT [pk, increment]
-    title VARCHAR(100) [not null]
-    artist_id INT [ref: > Artists.artist_id]
-    release_date DATE
-    cover_image_url VARCHAR(255)
-    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
-}
+-- Albums tablosu
+CREATE TABLE Albums (
+    album_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    artist_id INT,
+    release_date DATE,
+    cover_image_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (artist_id) REFERENCES Artists(artist_id)
+);
 
-Table Songs {
-    song_id INT [pk, increment]
-    title VARCHAR(100) [not null]
-    album_id INT [ref: > Albums.album_id]
-    artist_id INT [ref: > Artists.artist_id]
-    duration INT [not null] // şarkı süresi saniye cinsinden
-    audio_file_url VARCHAR(255) [not null]
-    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
-    image VARCHAR(255)
-}
+-- Songs tablosu
+CREATE TABLE Songs (
+    song_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    album_id INT,
+    artist_id INT,
+    duration INT NOT NULL, -- şarkı süresi saniye cinsinden
+    audio_file_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    image VARCHAR(255),
+    listen_count INT,
+    FOREIGN KEY (album_id) REFERENCES Albums(album_id),
+    FOREIGN KEY (artist_id) REFERENCES Artists(artist_id)
+);
 
-Table Playlists {
-    playlist_id INT [pk, increment]
-    name VARCHAR(100) [not null]
-    user_id INT [ref: > Users.user_id]
-    created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
-    bgcolor VARCHAR(45)
-}
+-- Playlists tablosu
+CREATE TABLE Playlists (
+    playlist_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    bgcolor VARCHAR(45),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
 
-Table Playlist_Songs {
-    playlist_id INT [ref: > Playlists.playlist_id]
-    song_id INT [ref: > Songs.song_id]
-    added_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
-    indexes {
-        (playlist_id, song_id) [pk]
-    }
-}
+-- Playlist_Songs tablosu
+CREATE TABLE Playlist_Songs (
+    playlist_id INT,
+    song_id INT,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (playlist_id, song_id),
+    FOREIGN KEY (playlist_id) REFERENCES Playlists(playlist_id),
+    FOREIGN KEY (song_id) REFERENCES Songs(song_id)
+);
 
-Table Follows {
-    user_id INT [ref: > Users.user_id]
-    artist_id INT [ref: > Artists.artist_id]
-    followed_at TIMESTAMP [default: `CURRENT_TIMESTAMP`]
-    indexes {
-        (user_id, artist_id) [pk]
-    }
-}
+-- Follows tablosu
+CREATE TABLE Follows (
+    user_id INT,
+    artist_id INT,
+    followed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, artist_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (artist_id) REFERENCES Artists(artist_id)
+);
