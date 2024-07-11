@@ -91,7 +91,7 @@ const SignUp = () => {
             </div>
             <div className="w-full flex justify-center mt-6 h-px bg-[#878787]"></div>
             <div className="pt-6">
-              <Link to="/login" className="text-[#a7a7a7]">
+              <Link to="/Login" className="text-[#a7a7a7]">
                 Hesabın var mı?{" "}
                 <span className="underline text-white">Buradan oturum aç.</span>
               </Link>

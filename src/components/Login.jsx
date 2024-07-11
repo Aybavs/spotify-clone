@@ -127,7 +127,7 @@ const Login = () => {
           <div className="mt-4 text-center text-gray-500">
             <p>
               Hesabın yok mu?{" "}
-              <Link to="/signup" className="text-white hover:underline">
+              <Link to="/SignUp" className="text-white hover:underline">
                 Spotify için kaydol
               </Link>
             </p>
