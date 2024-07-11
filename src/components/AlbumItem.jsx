@@ -1,9 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
-// eslint-disable-next-line react/prop-types
 const AlbumItem = ({ image, name, desc, id }) => {
   const navigate = useNavigate();
+
   return (
     <div
       onClick={() => navigate(`/album/${id}`)}
@@ -14,6 +15,13 @@ const AlbumItem = ({ image, name, desc, id }) => {
       <p className="text-slate-200 text-sm">{desc}</p>
     </div>
   );
+};
+
+AlbumItem.propTypes = {
+  image: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
 
 export default AlbumItem;
