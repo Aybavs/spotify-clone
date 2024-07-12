@@ -8,7 +8,6 @@ import { PLayerContext } from "./context/PlayerContext";
 import Login from "./components/Login";
 import GoogleAuthProviderConfig from "./googleAuth";
 import { GoogleLogin } from "@react-oauth/google";
-
 const App = () => {
   const { audioRef, track } = useContext(PLayerContext);
   const location = useLocation();

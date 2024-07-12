@@ -1,6 +1,6 @@
-import { GoogleLogin } from "@react-oauth/google";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -8,13 +8,26 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
 
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // Giriş formu gönderme işlemleri burada yapılacak
   };
 
+  const googleLogin = useGoogleLogin({
+    flow: "auth-code", // burada auth-code veya implicit kullanabilirsiniz
+    onSuccess: async (tokenResponse) => {
+      console.log(tokenResponse);
+      // Burada tokenResponse'u işleyip kullanıcı bilgilerini alabilirsiniz
+      const userId = tokenResponse.authuser; // Örnek olarak authuser kullanıldı, bunu değiştirebilirsiniz
+      navigate(`/${userId}`);
+    },
+    onError: () => console.log("Login Failed"),
+  });
+
   return (
-    <div className="h-screen @apply bg-[linear-gradient(rgba(255,255,255,0.1)_0%,rgb(0,0,0)_100%)] flex items-center justify-center text-white">
+    <div className="h-screen bg-[linear-gradient(rgba(255,255,255,0.1)_0%,rgb(0,0,0)_100%)] flex items-center justify-center text-white">
       <div className="bg-[#121212] p-8 mt-[-50px] rounded-lg shadow-lg w-full sm:w-[734px] flex justify-center">
         <div className="w-[324px]">
           <header className="flex flex-col items-center mb-8">
@@ -32,14 +45,16 @@ const Login = () => {
             <h1 className="text-3xl font-bold">Spotify&apos;da oturum aç</h1>
           </header>
           <div className="flex flex-col space-y-4 mb-6 justify-center items-center">
-            <button className="flex items-center justify-center w-[324px] py-2 bg-transparent border border-gray-400 rounded-full hover:border-white">
-              <span className="mr-2"></span>
-              Google ile devam et
-              <GoogleLogin
-                clientId="563675178293-ilfitt408k1gvic3lvqcsi6j3mht26og.apps.googleusercontent.com"
-                buttonText="Google ile Giriş Yap"
-                cookiePolicy={"single_host_origin"}
+            <button
+              onClick={() => googleLogin()}
+              className="flex items-center justify-center w-[324px] py-2 bg-transparent border border-gray-400 rounded-full hover:border-white"
+            >
+              <img
+                src="https://developers.google.com/identity/images/g-logo.png"
+                alt="Google"
+                className="w-4 h-4 mr-2"
               />
+              Google ile devam et
             </button>
             <button className="flex items-center justify-center w-[324px] py-2 bg-transparent border border-gray-400 rounded-full hover:border-white">
               <span className="mr-2"></span>
@@ -127,7 +142,7 @@ const Login = () => {
           <div className="mt-4 text-center text-gray-500">
             <p>
               Hesabın yok mu?{" "}
-              <Link to="/SignUp" className="text-white hover:underline">
+              <Link to="/signup" className="text-white hover:underline">
                 Spotify için kaydol
               </Link>
             </p>
