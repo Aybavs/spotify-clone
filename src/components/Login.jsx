@@ -1,27 +1,31 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useAuth } from "../context/AuthContext.jsx"; // Import useAuth
 
 const Login = () => {
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
+  const { signIn } = useAuth(); // Use signIn from useAuth
 
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Giriş formu gönderme işlemleri burada yapılacak
+    // Authenticate user, get token, and sign in
+    const token = "your-auth-token"; // Replace with actual token from your auth logic
+    signIn(token);
+    navigate("/"); // Redirect to the home page after login
   };
 
   const googleLogin = useGoogleLogin({
-    flow: "auth-code", // burada auth-code veya implicit kullanabilirsiniz
+    flow: "auth-code",
     onSuccess: async (tokenResponse) => {
       console.log(tokenResponse);
-      // Burada tokenResponse'u işleyip kullanıcı bilgilerini alabilirsiniz
-      const userId = tokenResponse.authuser; // Örnek olarak authuser kullanıldı, bunu değiştirebilirsiniz
-      navigate(`/${userId}`);
+      signIn(tokenResponse.code); // Sign in with Google token
+      navigate(`/`);
     },
     onError: () => console.log("Login Failed"),
   });

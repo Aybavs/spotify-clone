@@ -1,9 +1,13 @@
 import React from "react";
 import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import useAuth
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { token } = useAuth(); // Use token from useAuth
+
+  console.log("Navbar token:", token); // Debugging
 
   const handleSignUpClick = () => {
     navigate("/SignUp");
@@ -30,22 +34,24 @@ const Navbar = () => {
             alt="Go Forward"
           />
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex space-x-4">
-            <button
-              className="text-gray-400 hover:text-white transition-transform transform hover:scale-105"
-              onClick={handleSignUpClick}
-            >
-              Kaydol
-            </button>
-            <button
-              className="px-7 py-3 bg-white text-black rounded-full hover:bg-gray-200 transition-transform transform hover:scale-105"
-              onClick={handleLoginClick}
-            >
-              Oturum aç
-            </button>
+        {!token && (
+          <div className="flex items-center gap-4">
+            <div className="flex space-x-4">
+              <button
+                className="text-gray-400 hover:text-white transition-transform transform hover:scale-105"
+                onClick={handleSignUpClick}
+              >
+                Kaydol
+              </button>
+              <button
+                className="px-7 py-3 bg-white text-black rounded-full hover:bg-gray-200 transition-transform transform hover:scale-105"
+                onClick={handleLoginClick}
+              >
+                Oturum aç
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <div className="flex items-center gap-2 mt-4">
         <p className="bg-white text-black px-4 py-1 rounded-2xl cursor-pointer">

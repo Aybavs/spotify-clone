@@ -8,15 +8,18 @@ import { PLayerContext } from "./context/PlayerContext";
 import Login from "./components/Login";
 import GoogleAuthProviderConfig from "./googleAuth";
 import { GoogleLogin } from "@react-oauth/google";
+import { useAuth } from "./context/AuthContext.jsx"; // Import useAuth
+
 const App = () => {
   const { audioRef, track } = useContext(PLayerContext);
   const location = useLocation();
+  const { token, signIn } = useAuth(); // Use token and signIn from useAuth
 
   const noNavbarAndPlayer = ["/SignUp", "/Login"];
 
   const handleGoogleSuccess = (response) => {
     console.log("Google Sign-In successful:", response);
-    // Kullanıcı bilgilerini alabilir ve gerekli işlemleri yapabilirsiniz.
+    signIn(response.code); // Assuming 'code' is the token, adjust if necessary
   };
 
   const handleGoogleFailure = (error) => {
